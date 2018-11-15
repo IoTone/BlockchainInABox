@@ -1,8 +1,9 @@
 {
     "version": "1.0.0",
     "smarthome_config": {
-        "nem_mosaicaddress": "",
-        "nem_microenergyserveraddress": "",
+        "nem_microenergy_mosaic_address": "",
+        "nem_microenergyserver_address": "",
+        "nem_microenergy_mosaic_description":"",
         "nem_smarthome_iuser_addresses": [
         ],
         "smarthome_services_udm": {
