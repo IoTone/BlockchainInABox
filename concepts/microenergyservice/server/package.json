@@ -18,6 +18,9 @@
     "smartgrid",
     "smarthome"
   ],
+  "dependencies": {
+    "nem-library": "^2.0.0-RC3"
+  },
   "author": "truedat101",
   "license": "ISC",
   "bugs": {
