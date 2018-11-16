@@ -4,8 +4,8 @@
         "nem_microenergy_mosaic_address": "",
         "nem_microenergyserver_address": "",
         "nem_microenergy_mosaic_description":"",
-	"nem_microenergy_mosaic_name":"ns_demo_mfp",
-	"nem_mciroenergy_mosaic_namespace":"microenergy",
+	    "nem_microenergy_mosaic_name":"ns_demo_mfp",
+	    "nem_mciroenergy_mosaic_namespace":"microenergy",
         "nem_smarthome_iuser_addresses": [
         ],
         "smarthome_services_udm": {
@@ -44,5 +44,9 @@
     "mes_server_config": {
         "microenergy_fund_pool_size": 86400.0,
         "microenergy_fund_pool_reset_period_in_ms": 86400000
+    },
+    "nem_net_config": {
+        "net": "mainnet",
+        "nis_servers": []
     }
 }
