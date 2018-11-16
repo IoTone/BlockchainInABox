@@ -24,11 +24,20 @@ if (argv.brainpassword) {
 
 const newbrainPassword =  new BrainPassword(brainpasswordinput)
 const newbrainWallet = BrainWallet.create("brain wallet", newbrainPassword);
-
 var acct = newbrainWallet.open(newbrainPassword);
-console.log("============Wallet Setup==========");
-console.log("Save the information generated here to a secure piece of paper.  Do not share publicly");
-console.log("New wallet account created:", acct.address);
-console.log("Private Key Begin\n", acct.privateKey);
-console.log("Public Key Begin\n", acct.publicKey);
-console.log("Brainpassword\n", newbrainPassword);
+
+if (argv.json) {
+    var walletobj = {};
+    walletobj.privateKey = acct.privateKey;
+    walletobj.publicKey = acct.publicKey;
+    walletobj.brainpassword = newbrainPassword;
+    walletobj.address = acct.address;
+    console.log(JSON.stringify(walletobj));
+} else {
+    console.log("============Wallet Setup==========");
+    console.log("Save the information generated here to a secure piece of paper.  Do not share publicly");
+    console.log("New wallet account created:", acct.address);
+    console.log("Private Key Begin\n", acct.privateKey);
+    console.log("Public Key Begin\n", acct.publicKey);
+    console.log("Brainpassword\n", newbrainPassword);
+}
