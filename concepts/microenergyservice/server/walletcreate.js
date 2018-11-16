@@ -22,7 +22,8 @@ if (argv.brainpassword) {
     brainpasswordinput = argv.brainpassword;
 }
 
-const newbrainPassword =  new BrainPassword(brainpasswordinput)
+const newbrainPassword =  new BrainPassword(brainpasswordinput);
+
 const newbrainWallet = BrainWallet.create("brain wallet", newbrainPassword);
 var acct = newbrainWallet.open(newbrainPassword);
 
