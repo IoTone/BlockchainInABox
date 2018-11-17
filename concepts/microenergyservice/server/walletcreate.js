@@ -7,6 +7,7 @@ var BrainWallet = require("nem-library").BrainWallet;
 var BrainPassword = require("nem-library").BrainPassword;
 var argv = require('yargs').argv
 var fs = require('fs');
+var nemSdk = require("nem-sdk").default;
 
 if (CONFIG.nem_net === "mainnet") {
     NEMLibrary.bootstrap(NetworkTypes.MAIN_NET);
@@ -44,3 +45,14 @@ if (argv.json) {
     console.log("Public Key Begin\n", acct.publicKey);
     console.log("Brainpassword\n", newbrainPassword);
 }
+// https://github.com/QuantumMechanics/NEM-sdk#94---create-wallet-files
+// Create a wallet file encoded from the brain
+// Convert stringified wallet object to word array
+var wordArray = nemSdk.crypto.js.enc.Utf8.parse(JSON.stringify(newbrainWallet));
+console.log("wordArray:", wordArray);
+// Word array to base64
+var base64wordarray = nemSdk.crypto.js.enc.Base64.stringify(wordArray);
+
+// Write out wallet
+fs.writeFileSync("./wallet.wlt", new Buffer(JSON.stringify(base64wordarray)));
+
