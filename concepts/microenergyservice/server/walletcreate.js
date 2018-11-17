@@ -6,6 +6,7 @@ var CONFIG = require('./config.json');
 var BrainWallet = require("nem-library").BrainWallet;
 var BrainPassword = require("nem-library").BrainPassword;
 var argv = require('yargs').argv
+var fs = require('fs');
 
 if (CONFIG.nem_net === "mainnet") {
     NEMLibrary.bootstrap(NetworkTypes.MAIN_NET);
@@ -33,7 +34,8 @@ if (argv.json) {
     walletobj.publicKey = acct.publicKey;
     walletobj.brainpassword = newbrainPassword;
     walletobj.address = acct.address;
-    console.log(JSON.stringify(walletobj));
+    fs.writeFileSync("./wallet.json", new Buffer(JSON.stringify(walletobj)));
+    // console.log(JSON.stringify(walletobj));
 } else {
     console.log("============Wallet Setup==========");
     console.log("Save the information generated here to a secure piece of paper.  Do not share publicly");
