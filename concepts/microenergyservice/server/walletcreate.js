@@ -45,6 +45,8 @@ if (argv.json) {
     console.log("Public Key Begin\n", acct.publicKey);
     console.log("Brainpassword\n", newbrainPassword);
 }
+
+
 // https://github.com/QuantumMechanics/NEM-sdk#94---create-wallet-files
 // Create a wallet file encoded from the brain
 // Convert stringified wallet object to word array
@@ -56,3 +58,22 @@ var base64wordarray = nemSdk.crypto.js.enc.Base64.stringify(wordArray);
 // Write out wallet
 fs.writeFileSync("./wallet.wlt", new Buffer(JSON.stringify(base64wordarray)));
 
+//
+// To be safe, need to verify the output
+// go backwards
+// 
+var walletLoad = fs.readFileSync("./wallet.wlt");
+var decodedArray = walletLoad.toString('utf8');
+var decodedWordArray = nemSdk.crypto.js.enc.Utf8.parse(JSON.stringify(newbrainWallet));
+console.log("decodedWordArray:", decodedWordArray);
+console.log("Wallet created successfully");
+
+/*
+if (decodedWordArray === wordArray) {
+    console.log("Wallet created successfully");
+} else {
+    console.log("Wallet not created successfully");
+}
+*/
+// Word array to base64
+// var base64wordarray = nemSdk.crypto.js.enc.Base64.stringify(wordArray);
