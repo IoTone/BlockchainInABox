@@ -56,15 +56,19 @@ console.log("wordArray:", wordArray);
 var base64wordarray = nemSdk.crypto.js.enc.Base64.stringify(wordArray);
 
 // Write out wallet
-fs.writeFileSync("./wallet.wlt", new Buffer(JSON.stringify(base64wordarray)));
+fs.writeFileSync("./newwallet_b.wlt", new Buffer(JSON.stringify(base64wordarray)));
+
+// This is the official API that I found digging around in the code for BrainWallet
+var altwalletstr = newbrainWallet.writeWLTFile();
+fs.writeFileSync("./newwallet.wlt", new Buffer(altwalletstr));
 
 //
 // To be safe, need to verify the output
 // go backwards
 // 
-var walletLoad = fs.readFileSync("./wallet.wlt");
+var walletLoad = fs.readFileSync("./newwallet_b.wlt");
 var decodedArray = walletLoad.toString('utf8');
-var decodedWordArray = nemSdk.crypto.js.enc.Utf8.parse(JSON.stringify(newbrainWallet));
+var decodedWordArray = nemSdk.crypto.js.enc.Utf8.parse(newbrainWallet);
 console.log("decodedWordArray:", decodedWordArray);
 console.log("Wallet created successfully");
 
