@@ -3,6 +3,7 @@
     "smarthome_config": {
         "nem_microenergy_mosaic_address": "",
         "nem_microenergyserver_address": "",
+        "nem_microenergy_owner_address": "",
         "nem_microenergy_mosaic_description":"",
 	    "nem_microenergy_mosaic_name":"ns_demo_mfp",
 	    "nem_mciroenergy_mosaic_namespace":"microenergy",
