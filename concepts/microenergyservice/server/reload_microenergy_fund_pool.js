@@ -32,6 +32,8 @@ try {
     console.error(error);
 }
 
+// unlock privatekey
+
 /*
 
 var decodedArray = walletLoad.toString('utf8');
