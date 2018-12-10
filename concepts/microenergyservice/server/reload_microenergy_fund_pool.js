@@ -54,8 +54,10 @@ var mosaicDefinitionMetaDataPair = nemSdk.model.objects.get("mosaicDefinitionMet
 // Create an un-prepared mosaic transfer transaction object (use same object as transfer tansaction)
 var transferTransaction = nemSdk.model.objects.create("transferTransaction")(CONFIG.smarthome_config.nem_microenergy_owner_address, 1, "Hello");
 
+console.log("owner address:", CONFIG.smarthome_config.nem_microenergy_owner_address);
+
 // Create the mosaic attachment
-var mosaicAttachment = nemSdk.model.objects.create("mosaicAttachment")(CONFIG.smarthome_config.nem_mciroenergy_mosaic_namespace, CONFIG.smarthome_config.nem_microenergy_mosaic_name, 1000); // 100 nw.fiat.eur (divisibility is 2 for this mosaic)
+var mosaicAttachment = nemSdk.model.objects.create("mosaicAttachment")(CONFIG.smarthome_config.nem_mciroenergy_mosaic_namespace, CONFIG.smarthome_config.nem_microenergy_mosaic_name, 1000000); // 100 nw.fiat.eur (divisibility is 2 for this mosaic)
 
 // Push attachment into transaction mosaics
 transferTransaction.mosaics.push(mosaicAttachment);
@@ -73,16 +75,19 @@ nemSdk.com.requests.namespace.mosaicDefinitions(endpoint, mosaicAttachment.mosai
 	// Check if the mosaic was found
 	if(undefined === neededDefinition[fullMosaicName]) return console.error("Mosaic not found !");
 
+    
 	// Set eur mosaic definition into mosaicDefinitionMetaDataPair
 	mosaicDefinitionMetaDataPair[fullMosaicName] = {};
 	mosaicDefinitionMetaDataPair[fullMosaicName].mosaicDefinition = neededDefinition[fullMosaicName];
-
+    console.log(mosaicDefinitionMetaDataPair);
 	// Prepare the transfer transaction object
 	var transactionEntity = nemSdk.model.transactions.prepare("mosaicTransferTransaction")(common, transferTransaction, mosaicDefinitionMetaDataPair, nemnet.id);
-
+    console.log(transactionEntity);
 	// Serialize transfer transaction and announce
-    nemSdk.model.transactions.send(common, transactionEntity, endpoint);
-    console.log("sent transaction");
+    var result = nemSdk.model.transactions.send(common, transactionEntity, endpoint).then(function(res) {
+        console.log(res);
+    });
+    console.log("sent transaction, result:", result);
 }, 
 function(err) {
 	console.error(err);
