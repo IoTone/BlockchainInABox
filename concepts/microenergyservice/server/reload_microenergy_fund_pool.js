@@ -56,12 +56,19 @@ var transferTransaction = nemSdk.model.objects.create("transferTransaction")(CON
 
 console.log("owner address:", CONFIG.smarthome_config.nem_microenergy_owner_address);
 
+// Create a mosaic attachment object
+// var mosaicAttachment2 = nemSdk.model.objects.create("mosaicAttachment")("nem", "xem", 1000000);
+
+// Push attachment into transaction mosaics
+// transferTransaction.mosaics.push(mosaicAttachment2);
+
 // Create the mosaic attachment
 var mosaicAttachment = nemSdk.model.objects.create("mosaicAttachment")(CONFIG.smarthome_config.nem_mciroenergy_mosaic_namespace, CONFIG.smarthome_config.nem_microenergy_mosaic_name, 1000000); // 100 nw.fiat.eur (divisibility is 2 for this mosaic)
 
 // Push attachment into transaction mosaics
 transferTransaction.mosaics.push(mosaicAttachment);
 
+// console.log("transferTransaction:", transferTransaction);
 // Need mosaic definition of nw.fiat:eur to calculate adequate fees, so we get it from network.
 // Otherwise you can simply take the mosaic definition from api manually (http://bob.nem.ninja/docs/#retrieving-mosaic-definitions) 
 // and put it into mosaicDefinitionMetaDataPair model (objects.js) next to nem:xem (be careful to respect object structure)
@@ -75,19 +82,43 @@ nemSdk.com.requests.namespace.mosaicDefinitions(endpoint, mosaicAttachment.mosai
 	// Check if the mosaic was found
 	if(undefined === neededDefinition[fullMosaicName]) return console.error("Mosaic not found !");
 
-    
+    // console.log(neededDefinition);
 	// Set eur mosaic definition into mosaicDefinitionMetaDataPair
 	mosaicDefinitionMetaDataPair[fullMosaicName] = {};
 	mosaicDefinitionMetaDataPair[fullMosaicName].mosaicDefinition = neededDefinition[fullMosaicName];
-    console.log(mosaicDefinitionMetaDataPair);
+    // console.log(mosaicDefinitionMetaDataPair);
 	// Prepare the transfer transaction object
 	var transactionEntity = nemSdk.model.transactions.prepare("mosaicTransferTransaction")(common, transferTransaction, mosaicDefinitionMetaDataPair, nemnet.id);
+    
+    if (isNaN(transactionEntity.fee)) {
+        console.log("Mosaic Transaction Fee is NaN, manually set a minimum fee");
+        // var totalFee = nemSdk.model.fees.calculateMosaics(1, mosaicDefinitionMetaDataPair, transferTransaction.mosaics);
+        var attachedMosaics = transferTransaction.mosaics;
+
+        /*
+        for (let i = 0; i < attachedMosaics.length; i++) {
+            let m = attachedMosaics[i];
+            let mosaicName = nemSdk.utils.format.mosaicIdToName(m.mosaicId);
+            if (!(mosaicName in mosaicDefinitionMetaDataPair)) {
+                console.log('unknown mosaic divisibility'); //
+            }
+        }
+        */
+        var totalFee = 100000;
+        console.log("calculated totalFee:", totalFee);
+        transactionEntity.fee = totalFee;
+    } else {
+        console.log("Mosaic Transaction Fee is:", transactionEntity.fee);
+    }
     console.log(transactionEntity);
-	// Serialize transfer transaction and announce
+    // XXX Why is the transferTransaction missing a fee???
+    // Serialize transfer transaction and announce
+    
     var result = nemSdk.model.transactions.send(common, transactionEntity, endpoint).then(function(res) {
         console.log(res);
     });
     console.log("sent transaction, result:", result);
+    
 }, 
 function(err) {
 	console.error(err);
