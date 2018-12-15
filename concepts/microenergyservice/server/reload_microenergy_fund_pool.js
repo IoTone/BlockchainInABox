@@ -52,7 +52,7 @@ var common = walletPriv; // wallet.unlockPrivateKey(walletPriv.brainpassword);
 var mosaicDefinitionMetaDataPair = nemSdk.model.objects.get("mosaicDefinitionMetaDataPair");
 
 // Create an un-prepared mosaic transfer transaction object (use same object as transfer tansaction)
-var transferTransaction = nemSdk.model.objects.create("transferTransaction")(CONFIG.smarthome_config.nem_microenergy_owner_address, 1, "Hello");
+var transferTransaction = nemSdk.model.objects.create("transferTransaction")(CONFIG.smarthome_config.nem_microenergy_owner_address, 1, "{'type' : 'test', 'msg':'hello'}");
 
 console.log("owner address:", CONFIG.smarthome_config.nem_microenergy_owner_address);
 
@@ -85,7 +85,8 @@ nemSdk.com.requests.namespace.mosaicDefinitions(endpoint, mosaicAttachment.mosai
     // console.log(neededDefinition);
 	// Set eur mosaic definition into mosaicDefinitionMetaDataPair
 	mosaicDefinitionMetaDataPair[fullMosaicName] = {};
-	mosaicDefinitionMetaDataPair[fullMosaicName].mosaicDefinition = neededDefinition[fullMosaicName];
+    mosaicDefinitionMetaDataPair[fullMosaicName].mosaicDefinition = neededDefinition[fullMosaicName];
+    mosaicDefinitionMetaDataPair[fullMosaicName].supply = neededDefinition[fullMosaicName].properties[1].value;
     // console.log(mosaicDefinitionMetaDataPair);
 	// Prepare the transfer transaction object
 	var transactionEntity = nemSdk.model.transactions.prepare("mosaicTransferTransaction")(common, transferTransaction, mosaicDefinitionMetaDataPair, nemnet.id);
@@ -113,12 +114,12 @@ nemSdk.com.requests.namespace.mosaicDefinitions(endpoint, mosaicAttachment.mosai
     console.log(transactionEntity);
     // XXX Why is the transferTransaction missing a fee???
     // Serialize transfer transaction and announce
-    
+    /*
     var result = nemSdk.model.transactions.send(common, transactionEntity, endpoint).then(function(res) {
         console.log(res);
     });
     console.log("sent transaction, result:", result);
-    
+    */
 }, 
 function(err) {
 	console.error(err);
