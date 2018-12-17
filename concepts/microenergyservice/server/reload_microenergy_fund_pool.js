@@ -86,7 +86,24 @@ nemSdk.com.requests.namespace.mosaicDefinitions(endpoint, mosaicAttachment.mosai
 	// Set eur mosaic definition into mosaicDefinitionMetaDataPair
 	mosaicDefinitionMetaDataPair[fullMosaicName] = {};
     mosaicDefinitionMetaDataPair[fullMosaicName].mosaicDefinition = neededDefinition[fullMosaicName];
+    // ★ See: https://github.com/QuantumMechanics/NEM-sdk/issues/36#issuecomment-373915795
+    // If we want to get the correct supply for a mutable Mosiac, this is necessary
+    /*
+    nemSdk.com.requests.mosaic.supply(endpoint, fullMosaicName).then(function(res) {
+        console.log("SUPPLY:", res.supply);
+        mosaicDefinitionMetaDataPair[fullMosaicName].supply = res.supply;
+        // Prepare the transfer transaction object
+        var transactionEntity = nem.model.transactions.prepare("mosaicTransferTransaction")(common, transferTransaction, mosaicDefinitionMetaDataPair, nem.model.network.data.testnet.id);
+
+        // Serialize transfer transaction and announce
+        nem.model.transactions.send(common, transactionEntity, endpoint);
+    }, function(err) {
+        console.error(err);
+    });
+    */
+
     mosaicDefinitionMetaDataPair[fullMosaicName].supply = neededDefinition[fullMosaicName].properties[1].value;
+    console.log("supply: ", mosaicDefinitionMetaDataPair[fullMosaicName].supply);
     // console.log(mosaicDefinitionMetaDataPair);
 	// Prepare the transfer transaction object
 	var transactionEntity = nemSdk.model.transactions.prepare("mosaicTransferTransaction")(common, transferTransaction, mosaicDefinitionMetaDataPair, nemnet.id);
@@ -95,17 +112,7 @@ nemSdk.com.requests.namespace.mosaicDefinitions(endpoint, mosaicAttachment.mosai
         console.log("Mosaic Transaction Fee is NaN, manually set a minimum fee");
         // var totalFee = nemSdk.model.fees.calculateMosaics(1, mosaicDefinitionMetaDataPair, transferTransaction.mosaics);
         var attachedMosaics = transferTransaction.mosaics;
-
-        /*
-        for (let i = 0; i < attachedMosaics.length; i++) {
-            let m = attachedMosaics[i];
-            let mosaicName = nemSdk.utils.format.mosaicIdToName(m.mosaicId);
-            if (!(mosaicName in mosaicDefinitionMetaDataPair)) {
-                console.log('unknown mosaic divisibility'); //
-            }
-        }
-        */
-        var totalFee = 100000;
+        var totalFee = 100000; // XXX This is a hack
         console.log("calculated totalFee:", totalFee);
         transactionEntity.fee = totalFee;
     } else {
@@ -114,12 +121,11 @@ nemSdk.com.requests.namespace.mosaicDefinitions(endpoint, mosaicAttachment.mosai
     console.log(transactionEntity);
     // XXX Why is the transferTransaction missing a fee???
     // Serialize transfer transaction and announce
-    /*
+    
     var result = nemSdk.model.transactions.send(common, transactionEntity, endpoint).then(function(res) {
         console.log(res);
     });
     console.log("sent transaction, result:", result);
-    */
 }, 
 function(err) {
 	console.error(err);
