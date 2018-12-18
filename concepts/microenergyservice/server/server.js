@@ -4,27 +4,32 @@ var nemSdk = require("nem-sdk").default;
 var CONFIG = require('./config.json');
 
 var nemnet;
+var nemnode;
 
-if (CONFIG.nem_net === "mainnet") {
+if (CONFIG["nem_net_config"].net === "mainnet") {
     nemnet = nemSdk.model.network.data.mainnet;
-} else if (CONFIG.nem_net === "testnet") {
+    nemnode = nemSdk.model.nodes.defaultMainnet;
+} else if (CONFIG["nem_net_config"].net === "testnet") {
     nemnet = nemSdk.model.network.data.testnet;
-} else if (CONFIG.nem_net === "mijinnet") {
+    nemnode = nemSdk.model.nodes.defaultTestnet;
+} else if (CONFIG["nem_net_config"].net === "mijinnet") {
     nemnet = nemSdk.model.network.data.mijin;
+    nemnode = nemSdk.model.nodes.defaultMijin;
 } else {
     // Default to main
     nemnet = nemSdk.model.network.data.mainnet;
+    nemnode = nemSdk.model.nodes.defaultMainnet;
 }
-
+console.log(nemnode);
 
 // Create an NIS endpoint object
-var endpoint = nemSdk.model.objects.create("endpoint")(nemSdk.model.nodes.defaultMainnet, nemSdk.model.nodes.defaultPort);
-
+var endpoint = nemSdk.model.objects.create("endpoint")(nemnode, nemSdk.model.nodes.websocketPort);
+console.log(endpoint);
 // Address to subscribe
-var address = "TBCI2A67UQZAKCR6NS4JWAEICEIGEIM72G3MVW5S";
+var usesrvraddr = CONFIG.smarthome_config["nem_microenergy_server_address"];
 
 // Create a connector object
-var connector = nemSdk.com.websockets.connector.create(endpoint, address);
+var connector = nemSdk.com.websockets.connector.create(endpoint, usesrvraddr);
 
 // Set start date of the monitor
 var date = new Date();
@@ -148,9 +153,12 @@ function connect(connector){
 
 function reconnect() {
     // Replace endpoint object
-    endpoint = nemSdk.model.objects.create("endpoint")("http://bob.nemSdk.ninja", 7778);
+    // XXX Why would they do it this way specifically to connect to a different service endpoint?
+    // endpoint = nemSdk.model.objects.create("endpoint")("http://bob.nemSdk.ninja", 7778);
+    endpoint = nemSdk.model.objects.create("endpoint")(nemnode,  nemSdk.model.nodes.websocketPort);
+
     // Replace connector
-    connector = nemSdk.com.websockets.connector.create(endpoint, address);
+    connector = nemSdk.com.websockets.connector.create(endpoint, usesrvraddr);
     // Set time
     date = new Date();
     // Show event
