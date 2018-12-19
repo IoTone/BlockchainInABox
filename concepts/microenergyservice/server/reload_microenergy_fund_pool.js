@@ -12,13 +12,13 @@ var walletPriv = require('./wallet.json');
 var walletLoad = fs.readFileSync("./wallet.wlt");
 var nemnet;
 
-if (CONFIG.nem_net === "mainnet") {
+if (CONFIG["nem_net_config"].net === "mainnet") {
     NEMLibrary.bootstrap(NetworkTypes.MAIN_NET);
     nemnet = nemSdk.model.network.data.mainnet;
-} else if (CONFIG.nem_net === "testnet") {
+} else if (CONFIG["nem_net_config"].net === "testnet") {
     NEMLibrary.bootstrap(NetworkTypes.TEST_NET);
     nemnet = nemSdk.model.network.data.testnet;
-} else if (CONFIG.nem_net === "mijinnet") {
+} else if (CONFIG["nem_net_config"].net === "mijinnet") {
     NEMLibrary.bootstrap(NetworkTypes.MIJIN_NET);
     nemnet = nemSdk.model.network.data.mijin;
 } else {
@@ -51,8 +51,12 @@ var common = walletPriv; // wallet.unlockPrivateKey(walletPriv.brainpassword);
 // Create variable to store our mosaic definitions, needed to calculate fees properly (already contains xem definition)
 var mosaicDefinitionMetaDataPair = nemSdk.model.objects.get("mosaicDefinitionMetaDataPair");
 
+var reloadmsg = {
+    "type": "reload",
+    "data": [1,"fish and chips", new Date()]
+}
 // Create an un-prepared mosaic transfer transaction object (use same object as transfer tansaction)
-var transferTransaction = nemSdk.model.objects.create("transferTransaction")(CONFIG.smarthome_config.nem_microenergy_owner_address, 1, "{'type' : 'test', 'msg':'hello'}");
+var transferTransaction = nemSdk.model.objects.create("transferTransaction")(CONFIG.smarthome_config.nem_microenergy_owner_address, 1, JSON.stringify(reloadmsg));
 
 console.log("owner address:", CONFIG.smarthome_config.nem_microenergy_owner_address);
 
