@@ -22,6 +22,9 @@ if (CONFIG["nem_net_config"].net === "mainnet") {
 }
 console.log(nemnode);
 
+var ns = CONFIG["smarthome_config"].nem_mciroenergy_mosaic_namespace;
+var mosaic = CONFIG["smarthome_config"].nem_microenergy_mosaic_name;
+
 // Create an NIS endpoint object
 var endpoint = nemSdk.model.objects.create("endpoint")(nemnode, nemSdk.model.nodes.websocketPort);
 console.log(endpoint);
@@ -72,7 +75,7 @@ function connect(connector){
             // Show event
             console.log(date.toLocaleString()+': Received a new block');
             // Show data
-            console.log(date.toLocaleString()+': ' + JSON.stringify(res) +'');
+            // console.log(date.toLocaleString()+': ' + JSON.stringify(res) +'');
         });
 
         // Show event
@@ -125,6 +128,74 @@ function connect(connector){
             console.log(date.toLocaleString()+': Received confirmed transaction');
             // Show data
             console.log(date.toLocaleString()+': ' + JSON.stringify(res));
+            //
+            // Filter out any messages intended for the server, nem_microenergy_server_address
+            // And parse out message type from the payload
+            //
+            /*
+            {
+                "meta": {
+                    "innerHash": {},
+                    "id": 0,
+                    "hash": {
+                        "data": "cf3564f31fab7b6748f761e5c6bdc0f7b5b7920b8008dda5fa6e1bb2aa844c5b"
+                    },
+                    "height": 1950085
+                },
+                "transaction": {
+                    "timeStamp": 118040949,
+                    "amount": 1000000,
+                    "signature": "f2d2b8c5ee9cd469bdcec94c82b8c4ad1e8cddce8fc06ba54b1367c3d605a2718cc0242a87dbcf781b7d69d4468cd87812e60fc22e414956060766665539590f",
+                    "fee": 100000,
+                    "recipient": "NBD7U6AIHFL7J2SOFKGF7WIPYK7D6SON7R7MNPSC",
+                    "mosaics": [{
+                        "quantity": 1000000,
+                        "mosaicId": {
+                            "namespaceId": "microenergy",
+                            "name": "ns_demo_mfp"
+                        }
+                    }],
+                    "type": 257,
+                    "deadline": 118127349,
+                    "message": {
+                        "payload": "7b2274797065223a202274657374222c2022666f6f223a20317d",
+                        "type": 1
+                    },
+                    "version": 1744830466,
+                    "signer": "c880e3a8f1578f3f726fe06f44ef4f9330ba98f6cc5f9f5c88d7dac70387fc1f"
+                }
+            }
+            */
+           if (res.transaction) {
+                // Check the mosaic
+                var mosaics = res.transaction.mosaics;
+                if (mosaics && mosaics[0].mosaicId.namespaceId === ns && mosaics[0].mosaicId.name === mosaic) {
+                    var transmsg_payload = res.transaction.message.payload;
+                    if (res.transaction.recipient === usesrvraddr) {
+                        // We've received a Microenergy transaction from a user
+                        // Parse out the message
+                        var qty = mosaics[0].quantity;
+                        try {
+                            var microenergy_msg = JSON.parse(nemSdk.utils.format.hexToUtf8(transmsg_payload));
+                            if (microenergy_msg && microenergy_msg.type === "use") {
+                                //
+                                // Handle smart home use type message
+                                //
+                                // data format: ["service id", timestamp, units, {payload}]
+                                console.log("mosaic qty: " + qty + ", handling use type microenergy message: ", microenergy_msg);
+                            }
+                        } catch(err) {
+                            console.error("Failure to parse incoming microenergy message");
+                        }
+                    } else {
+                        // We sent out a transaction
+                    }
+                    
+                   //
+                   // If we are the recipient, then we can finalize the lighting change
+                   //
+                }
+           }
         });
         
         // Show event

@@ -30,6 +30,7 @@ if (CONFIG["nem_net_config"].net === "mainnet") {
     nemnet = nemSdk.model.network.data.mainnet;
     nemnode = nemSdk.model.nodes.defaultMainnet;
 }
+
 // Create an NIS endpoint object
 var endpoint = nemSdk.model.objects.create("endpoint")(nemnode, nemSdk.model.nodes.defaultPort);
 
