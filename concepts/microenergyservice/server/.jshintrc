@@ -1,0 +1,18 @@
+{
+    "curly": true,
+    "eqeqeq": true,
+    "eqnull": true,
+    "browser": true,
+    "multistr": true,
+    "node" : true,
+    "loopfunc": true,
+    "-W038": true,
+    "-W004": true,
+    "-W069": true,
+    "globals": {
+      "jQuery": true,
+      "console": true,
+      "module": true,
+      "document": true
+    }
+}

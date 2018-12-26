@@ -174,18 +174,21 @@ function connect(connector){
                     if (res.transaction.recipient === usesrvraddr) {
                         // We've received a Microenergy transaction from a user
                         // Parse out the message
-                        var qty = mosaics[0].quantity;
+                        var qty = mosaics[0].quantity/100000.0;
                         try {
                             var microenergy_msg = JSON.parse(nemSdk.utils.format.hexToUtf8(transmsg_payload));
+                            console.log("mosaic qty: " + qty + ", handling use type microenergy message: ", microenergy_msg);
                             if (microenergy_msg && microenergy_msg.type === "use") {
                                 //
                                 // Handle smart home use type message
                                 //
                                 // data format: ["service id", timestamp, units, {payload}]
-                                console.log("mosaic qty: " + qty + ", handling use type microenergy message: ", microenergy_msg);
+                                // console.log("handling use time of " + + " for service id:  " + );
+                                var utilization_time_in_millis = compute_microenergy_use_time_in_millis(qty, CONFIG["smarthome_config"].nem_microenergy_rate_plan, 0);
+                                console.log("Activating service(s) for " + utilization_time_in_millis + "ms");
                             }
                         } catch(err) {
-                            console.error("Failure to parse incoming microenergy message");
+                            console.error("Error handling incoming microenergy message, reason:", err);
                         }
                     } else {
                         // We sent out a transaction
@@ -236,4 +239,41 @@ function reconnect() {
     console.log(date.toLocaleString()+': Trying to connect to: '+ endpoint.host);
     // Try to establish a connection
     connect(connector);
+}
+
+/**
+ * microenergy_units: the number of mosaic units sent
+ * rate_plan: the rate plan used to compute cost/utlization time
+ * energy_savings_factor: a value less than 1, used to compute discounted utilization time, wih 1 meaning 100% efficiency
+ * and 0 meaning 0% efficiency.  By efficiency, we mean the % of time we cut from utilization.  So a 75% efficient (0.75) would
+ * mean we are cutting 75% of the time computed, using less or consuming less.  A value of 0 would not factor into the 
+ * utilization time computed.  The idea is that a "green" setting might improve efficiency through reduction of time used.
+ * 
+ * returns: number of milliseconds of utilization
+ */
+function compute_microenergy_use_time_in_millis(microenergy_units, rate_plan, energy_savings_factor) {
+    if (!microenergy_units) {
+        return 0;
+    } else if (microenergy_units <= 0) {
+        return 0;
+    } else {
+        if (!rate_plan) {
+            rate_plan = "A";
+        }
+
+        if (!energy_savings_factor) {
+            energy_savings_factor = 0;
+        }
+
+        var rate_factor = CONFIG["smarthome_config"].nem_microenergy_rate_plans[rate_plan];
+
+        var utlization_time = rate_factor*microenergy_units;
+
+        if (energy_savings_factor > 0) {
+            return (utlization_time-(utlization_time*energy_savings_factor));
+        } else {
+            return utlization_time;
+        }
+        
+    }
 }

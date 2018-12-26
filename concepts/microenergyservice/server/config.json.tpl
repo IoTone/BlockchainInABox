@@ -7,6 +7,10 @@
         "nem_microenergy_mosaic_description":"",
 	    "nem_microenergy_mosaic_name":"ns_demo_mfp",
 	    "nem_mciroenergy_mosaic_namespace":"microenergy",
+        "nem_microenergy_rate_plan": "A",
+        "nem_microenergy_rate_plans": {
+            "A": 10000
+        },
         "nem_smarthome_iuser_addresses": [
         ],
         "smarthome_services_udm": {

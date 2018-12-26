@@ -4,7 +4,9 @@
   "description": "A NEM based microenergy server for blockchain based microenergy contracts.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "jshint ./server.js",
+    "start": "node debug.js",
+    "test": "mocha -w test/"
   },
   "repository": {
     "type": "git",
