@@ -180,7 +180,7 @@ function connect(connector){
                     if (res.transaction.recipient === usesrvraddr) {
                         // We've received a Microenergy transaction from a user
                         // Parse out the message
-                        var qty = mosaics[0].quantity/100000.0;
+                        var qty = mosaics[0].quantity/1000000.0;
                         try {
                             var microenergy_msg = JSON.parse(nemSdk.utils.format.hexToUtf8(transmsg_payload));
                             console.log("mosaic qty: " + qty + ", handling use type microenergy message: ", microenergy_msg);
@@ -192,6 +192,10 @@ function connect(connector){
                                 // console.log("handling use time of " + + " for service id:  " + );
                                 var utilization_time_in_millis = compute_microenergy_use_time_in_millis(qty, CONFIG["smarthome_config"].nem_microenergy_rate_plan, 0);
                                 console.log("Activating service(s) for " + utilization_time_in_millis + "ms");
+                                hueCmd(CONFIG.smarthome_config["smarthome_services_udm"].udm_devices[0].udm_key, "udm_capability_x:OnOff:_", [1]);
+                                setTimeout(function() {
+                                    hueCmd(CONFIG.smarthome_config["smarthome_services_udm"].udm_devices[0].udm_key, "udm_capability_x:OnOff:_", [0]);
+                                }, utilization_time_in_millis);
                             }
                         } catch(err) {
                             console.error("Error handling incoming microenergy message, reason:", err);
@@ -310,7 +314,17 @@ function hueStartup() {
     });
 
     // Perform a reset
-    hueCmd("0", "udm_capability_x:OnOff:_", [0]);
+    /*
+    "smarthome_services_udm": {
+        "udm_version":"0.9.1",
+        "udm_devices": [
+            {
+                "udm_key": "0",
+    */
+    setTimeout(function() {
+        hueCmd(CONFIG.smarthome_config["smarthome_services_udm"].udm_devices[0].udm_key, "udm_capability_x:OnOff:_", [0]);
+    }, 10000);
+    
 }
 
 function hueCmd(udm_device_id, udm_capability, data) {
