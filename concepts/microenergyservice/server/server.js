@@ -1,7 +1,13 @@
 // Load nem-browser library
 var nemSdk = require("nem-sdk").default;
-
+let huejay = require('huejay');
 var CONFIG = require('./config.json');
+
+var huebridges = [];
+
+// see: https://github.com/sqmk/huejay#clientuserscreate---create-user
+var hue_username = CONFIG["smarthome_config"].hue_username;
+var hue_client;
 
 var nemnet;
 var nemnode;
@@ -275,5 +281,127 @@ function compute_microenergy_use_time_in_millis(microenergy_units, rate_plan, en
             return utlization_time;
         }
         
+    }
+}
+
+//
+// Hue Specific Functions
+//
+huejay.discover({ strategy: 'upnp' })
+    .then(bridges => {
+        for (let bridge of bridges) {
+            huebridges.push(bridge.ip);
+            console.log(`Id: ${bridge.id}, IP: ${bridge.ip}`);
+        }
+        console.log("About to startup Hue Client");
+        hueStartup();
+    })
+    .catch(error => {
+        console.log(`An error occurred: ${error.message}`);
+    });
+
+function hueStartup() {
+    console.log("Startup " + huebridges);
+    hue_client = new huejay.Client({
+        host: huebridges[0], // XXX Always assume only one
+        port: 80, // Optional
+        username: hue_username, // Optional
+        timeout: 15000, // Optional, timeout in milliseconds (15000 is the default)
+    });
+
+    // Perform a reset
+    hueCmd("0", "udm_capability_x:OnOff:_", [0]);
+}
+
+function hueCmd(udm_device_id, udm_capability, data) {
+    /**
+     * For example, if we get a message to change hue level:
+     * 00: 2 udm_capability_value_not_applicable_x 1:udm_capability_x:Hue:_ 69
+     * Assume some things:
+     *
+     * - 00: is always going to be the UDM Request command, so we can assume that it's a valid UDM request
+     * command
+     *
+     * NOTE: The code below will fail if incoming messages are malformed.
+     */
+    try {
+        udm_value = data[0];
+
+        //
+        // Now, a massive switch statement or if-else can work here
+        // Typically we'd always want to double check if the value has changed at all
+        // before performing any update
+        //
+        if (udm_capability === "udm_capability_x:Hue:_") {
+            //
+            // It's changing the hue, but we have to know the format of the incoming value
+            // It will be a HEX value, between 0-255, so we need to convert it for our purposes
+            // to whatever HUE is expecting.
+            //
+            // The incoming HUE value will be using the HSLA color model
+            // We want to convert it to our color
+            // See: http://stackoverflow.com/a/22564849/796514
+            // Convert the Hex value to a number, scale to be 0-360
+            // and then multiply by 182.04
+            // XXX Double check my math
+            var scaled_value = udm_value;
+
+            hue_client.lights.getAll()
+                .then(lights => {
+                    lights.map(light => {
+                    light.hue = scaled_value;
+                    light.saturation = parseInt((scaled_value/100)*250);
+                    light.brightness = parseInt((scaled_value/100)*250);
+                    hue_client.lights.save(light)
+
+                    .then(light => {
+                        console.log(`Updated light [${light.id}]`);
+                        })
+                    })
+                    // light.name = 'New light name';
+                    // light.brightness = 254;
+                    // light.hue = scaled_value;
+                    // // light.saturation = 254;
+                    // return client.lights.save(light);
+                })
+                // .then(light => {
+                //     console.log(`Updated light [${light.id}]`);
+                // })
+                .catch(error => {
+                    console.log('Something went wrong');
+                    console.log(error.stack);
+                });
+        } else if (udm_capability === "udm_capability_x:OnOff:_") {
+
+            var light_state;
+
+            if (udm_value === 1) {
+            light_state = true;
+            } else if (udm_value === 0) {
+            light_state = false;
+            }
+
+            hue_client.lights.getAll()
+                .then(lights => {
+                lights.map(light => {
+                    light.on = light_state;
+                    hue_client.lights.save(light)
+
+                    .then(light => {
+                        console.log(`Updated light [${light.id}]`);
+                    })
+                })
+                    // light.name = 'New light name';
+                    // light.brightness = 254;
+                    // light.hue = scaled_value;
+                    // // light.saturation = 254;
+                    // return client.lights.save(light);
+                })
+
+        } else {
+            console.error("Unhandled capability " + udm_capability + ", ignoring");
+        }
+    } catch (err) {
+        console.error("Something bad happend on inbox message, reason:", err);
     }
 }

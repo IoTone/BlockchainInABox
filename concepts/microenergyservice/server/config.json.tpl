@@ -13,6 +13,7 @@
         },
         "nem_smarthome_iuser_addresses": [
         ],
+        "hue_username": "MlRAo3Ed1bmY03pOAT-7-1djzK3Pq7VbiREBZetr",
         "smarthome_services_udm": {
             "udm_version":"0.9.1",
             "udm_devices": [

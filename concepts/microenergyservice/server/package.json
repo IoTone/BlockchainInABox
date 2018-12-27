@@ -22,7 +22,8 @@
   ],
   "dependencies": {
     "nem-library": "^2.0.0-RC3",
-    "yargs": "^12.0.2"
+    "yargs": "^12.0.2",
+    "huejay": "^1.5.0"
   },
   "author": "truedat101",
   "license": "ISC",
