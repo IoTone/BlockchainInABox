@@ -13,6 +13,7 @@ A simple example demonstrating how to create and configure a Web REST API connec
 
 1. Make a copy of config.json.tpl and sae as config.json.  You will need to modify the configuration for your demonstration use 
 of the Microenergy mosaic and addresses.
+1.  export AWS_PROFILE=claudia (assuming you have an IAM role setup and configured in .aws/configuration with the label, claudia.)
 1. run `npm install` to grab the dependencies
 1. run `npm start` to set up the lambda project under the default name on AWS 
 1. Check out the API ID in `claudia.json` (the previous step creates the file)
@@ -26,7 +27,9 @@ Claudia assigns a generic input processing template to all requests, that just d
 
 ## Testing
 
-Just run `npm test`.  You can also try thsi out using curl:
+Just run `npm test`.  You can also try thsi out using curl.
 
-- curl -X PUT
+Just validate the setup:
+
+- curl -X POST https://ky2pd7dln4.execute-api.us-west-2.amazonaws.com/latest/echo
 
