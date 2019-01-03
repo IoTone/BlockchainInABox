@@ -9,6 +9,24 @@ var CONFIG = require('./config.json');
 module.exports = api;
 
 //
+// Microenergy Routes
+//
+
+/**
+ * use .post to handle a post; or .delete, .patch, .head, .put
+ * 
+ * request body params:
+ * - address (of the wallet owning the mosaic)
+ * - units (of the Microenergy Mosaic to use)
+ * 
+ * The destination NEM address is hardcoded in the configuration.
+ */
+api.post('/use', function (request) {
+	'use strict';
+	return request.body;
+}, {success: 200});
+
+//
 // These are the legacy routes from the web-api demo.  Leave a few in functional for testing
 //
 

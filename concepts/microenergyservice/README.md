@@ -12,4 +12,4 @@ The Microenergy Service concept shows off ideas discussed in issue #2 : https://
 For the first run, set up a wallet:
 - node walletcreate.js
 - Optionally, you should provide a brainwallet as input to ensure a secure and unique wallet id:
-node walletcreate --brainpassword="all my great passwords are in my brain wallet"
+node walletcreate.s --brainpassword="all my great passwords are in my brain wallet including this should be at least twelve random words"

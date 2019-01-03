@@ -31,5 +31,32 @@ Just run `npm test`.  You can also try thsi out using curl.
 
 Just validate the setup:
 
-- curl -X POST https://ky2pd7dln4.execute-api.us-west-2.amazonaws.com/latest/echo
+- curl -X POST https://APP_ID.execute-api.us-west-2.amazonaws.com/latest/echo
 
+Another dummy test:
+
+- curl -X GET https://APP_ID.execute-api.us-west-2.amazonaws.com/latest/greet?name=Bilbo
+
+## Performance
+
+Ideally the lambda package is as small as possible.  We've added a large-ish library and that may affect the initial cold start time.
+
+For example, without the large libraries, 
+
+```
+$ time curl -X GET https://APP_ID.execute-api.us-west-2.amazonaws.com/latest/greet?name=Bilbo
+"Bilbo is really impeccable"
+real    0m0.992s
+user    0m0.000s
+sys     0m0.031s
+```
+
+With the large library, cold start:
+
+```
+$ time curl -X GET https://ky2pd7dln4.execute-api.us-west-2.amazonaws.com/latest/greet?name=Bilbo
+"Bilbo is really dandy"
+real    0m1.266s
+user    0m0.031s
+sys     0m0.015s
+```

@@ -4,7 +4,8 @@
   "private": true,
   "files": [
     "*.js",
-    "config.json"
+    "config.json",
+    "wallet.json"
   ],
   "scripts": {
     "start": "claudia create --name microenergy-web-api --region us-west-2 --api-module web",
@@ -15,7 +16,8 @@
   },
   "dependencies": {
     "claudia-api-builder": "^4",
-    "superb": "^3.0.0"
+    "superb": "^3.0.0",
+    "nem-library": "^2.0.0-RC3"
   },
   "version": "1.0.0",
   "main": "web.js",

@@ -35,7 +35,7 @@ if (argv.json) {
     walletobj.publicKey = acct.publicKey;
     walletobj.brainpassword = newbrainPassword;
     walletobj.address = acct.address;
-    fs.writeFileSync("./wallet.json", new Buffer(JSON.stringify(walletobj)));
+    fs.writeFileSync("./newwallet.json", new Buffer(JSON.stringify(walletobj)));
     // console.log(JSON.stringify(walletobj));
 } else {
     console.log("============Wallet Setup==========");
