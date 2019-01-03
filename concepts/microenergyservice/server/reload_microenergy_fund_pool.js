@@ -28,6 +28,11 @@ if (CONFIG["nem_net_config"].net === "mainnet") {
     nemnet = nemSdk.model.network.data.mainnet;
     nemnode = nemSdk.model.nodes.defaultMainnet;
 }
+var microenergy_units = 1;
+
+if (argv.units) {
+    microenergy_units = argv.units;
+}
 
 console.log("nemnet:", nemnet);
 
@@ -69,7 +74,7 @@ console.log("owner address:", CONFIG.smarthome_config.nem_microenergy_owner_addr
 // transferTransaction.mosaics.push(mosaicAttachment2);
 
 // Create the mosaic attachment
-var mosaicAttachment = nemSdk.model.objects.create("mosaicAttachment")(CONFIG.smarthome_config.nem_mciroenergy_mosaic_namespace, CONFIG.smarthome_config.nem_microenergy_mosaic_name, 1000000); // Send 1, assuming divisability of 6 digits
+var mosaicAttachment = nemSdk.model.objects.create("mosaicAttachment")(CONFIG.smarthome_config.nem_mciroenergy_mosaic_namespace, CONFIG.smarthome_config.nem_microenergy_mosaic_name, microenergy_units*1000000); // Send 1, assuming divisability of 6 digits
 // 100 nw.fiat.eur (divisibility is 2 for this mosaic)
 
 // Push attachment into transaction mosaics
