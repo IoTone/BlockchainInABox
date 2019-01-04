@@ -37,6 +37,10 @@ Another dummy test:
 
 - curl -X GET https://APP_ID.execute-api.us-west-2.amazonaws.com/latest/greet?name=Bilbo
 
+Sending use of lighting 
+
+-  curl -X POST -d use=1 https://APP_ID.execute-api.us-west-2.amazonaws.com/latest/use
+
 ## Performance
 
 Ideally the lambda package is as small as possible.  We've added a large-ish library and that may affect the initial cold start time.

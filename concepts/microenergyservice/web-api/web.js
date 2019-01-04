@@ -28,13 +28,24 @@ api.post('/use', function (request) {
 	var nemnet;
 	var nemnode;
 
-	var req_address = request.address;
-	console.log("Ignoring request address");
-	var req_units = request.units;
+	console.log("body post:", request.body);
+	var req_address = request.body.address;
+
+	if (req_address) {
+		console.log("Ignoring request address");
+	}
+
+	var req_units = request.body.units;
 
 	if (!req_units) {
 		req_units = 1; // Default to 1
 		console.log("No units provided, using default of 1 microenergy unit");
+	}
+	 
+	var req_id = request.body.id;
+
+	if (req_id) {
+		console.log("request id = ", req_id);
 	}
 
 	if (CONFIG["nem_net_config"].net === "mainnet") {
@@ -57,9 +68,6 @@ api.post('/use', function (request) {
 	// Create an NIS endpoint object
 	var endpoint = nemSdk.model.objects.create("endpoint")(nemnode, nemSdk.model.nodes.defaultPort);
 
-
-	var decodedArray = walletLoad.toString('utf8');
-
 	// unlock privatekey
 	var common = walletPriv;
 
@@ -67,12 +75,12 @@ api.post('/use', function (request) {
 	// Create variable to store our mosaic definitions, needed to calculate fees properly (already contains xem definition)
 	var mosaicDefinitionMetaDataPair = nemSdk.model.objects.get("mosaicDefinitionMetaDataPair");
 
-	var micorenergymsg = {
+	var microenergymsg = {
 		"type": "use",
 		"data": [new Date(), "microenergy-web-api", "ces2019demo", "1.0.0"]
 	}
 	// Create an un-prepared mosaic transfer transaction object (use same object as transfer tansaction)
-	var transferTransaction = nemSdk.model.objects.create("transferTransaction")(CONFIG.smarthome_config.nem_microenergy_owner_address, 1, JSON.stringify(microenergymsg));
+	var transferTransaction = nemSdk.model.objects.create("transferTransaction")(CONFIG.smarthome_config.nem_microenergy_server_address, 1, JSON.stringify(microenergymsg));
 
 	console.log("owner address:", CONFIG.smarthome_config.nem_microenergy_owner_address);
 
@@ -83,7 +91,7 @@ api.post('/use', function (request) {
 	// transferTransaction.mosaics.push(mosaicAttachment2);
 
 	var microenergy_units = req_units*1000000;
-	
+	console.log("prepare microenergy transaction of: ", microenergy_units);
 	// Create the mosaic attachment
 	var mosaicAttachment = nemSdk.model.objects.create("mosaicAttachment")(CONFIG.smarthome_config.nem_mciroenergy_mosaic_namespace, CONFIG.smarthome_config.nem_microenergy_mosaic_name, microenergy_units); // Send 1, assuming divisability of 6 digits
 	// 100 nw.fiat.eur (divisibility is 2 for this mosaic)
@@ -145,8 +153,8 @@ api.post('/use', function (request) {
 		// XXX Why is the transferTransaction missing a fee???
 		// Serialize transfer transaction and announce
 		
-		var result = nemSdk.model.transactions.send(common, transactionEntity, endpoint).then(function(res) {
-			// console.log(res);
+		return nemSdk.model.transactions.send(common, transactionEntity, endpoint).then(function(res) {
+			console.log("transaction sent:", res);
 			return res;
 		});
 		// console.log("sent transaction, result:", result);
