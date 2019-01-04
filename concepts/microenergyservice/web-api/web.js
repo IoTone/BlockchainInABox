@@ -7,6 +7,7 @@ var ApiBuilder = require('claudia-api-builder'),
 var CONFIG = require('./config.json');
 var nemSdk = require("nem-sdk").default;
 var walletPriv = require('./wallet.json');
+var querystring = require('querystring');
 
 module.exports = api;
 
@@ -29,20 +30,23 @@ api.post('/use', function (request) {
 	var nemnode;
 
 	console.log("body post:", request.body);
-	var req_address = request.body.address;
+
+	// The body should be sent as json, although it looks like right now it's a string
+	var reqbody = querystring.parse(request.body);
+	var req_address = reqbody.address;
 
 	if (req_address) {
 		console.log("Ignoring request address");
 	}
 
-	var req_units = request.body.units;
+	var req_units = reqbody.units;
 
 	if (!req_units) {
 		req_units = 1; // Default to 1
 		console.log("No units provided, using default of 1 microenergy unit");
 	}
 	 
-	var req_id = request.body.id;
+	var req_id = reqbody.id;
 
 	if (req_id) {
 		console.log("request id = ", req_id);

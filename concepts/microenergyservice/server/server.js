@@ -397,9 +397,11 @@ function hueCmd(udm_device_id, udm_capability, data) {
             var light_state;
 
             if (udm_value === 1) {
-            light_state = true;
+                light_state = true;
+                console.log("Turning on lights");
             } else if (udm_value === 0) {
-            light_state = false;
+                light_state = false;
+                console.log("Turning off lights");
             }
 
             hue_client.lights.getAll()

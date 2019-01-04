@@ -42,6 +42,14 @@ nemSdk.com.requests.namespace.info(endpoint, usens).then(function(res) {
 	console.error(err);
 });
 
+// Get account data
+nemSdk.com.requests.account.data(endpoint, usesrvraddr).then(function(res) {
+	console.log("\nAccount data:");
+	console.log(res);
+}, function(err) {
+	console.error(err);
+});
+
 // Get mosaic definitions of a namespace or sub-namespace
 nemSdk.com.requests.namespace.mosaicDefinitions(endpoint, usens).then(function(res) {
 	console.log("\nMosaic definitions:");
