@@ -121,19 +121,6 @@ function connect(connector){
             console.log(date.toLocaleString()+': Received unconfirmed transaction');
             // Show data
             console.log(date.toLocaleString()+': ' + JSON.stringify(res));
-        });
-
-        // Show event
-    	console.log(date.toLocaleString()+': Subscribing to confirmed transactions of '+ connector.address);
-
-        // Subscribe to confirmed transactions channel
-        nemSdk.com.websockets.subscribe.account.transactions.confirmed(connector, function(res) {
-            // Set time
-            date = new Date();
-            // Show event
-            console.log(date.toLocaleString()+': Received confirmed transaction');
-            // Show data
-            console.log(date.toLocaleString()+': ' + JSON.stringify(res));
             //
             // Filter out any messages intended for the server, nem_microenergy_server_address
             // And parse out message type from the payload
@@ -204,11 +191,24 @@ function connect(connector){
                         // We sent out a transaction
                     }
                     
-                   //
-                   // If we are the recipient, then we can finalize the lighting change
-                   //
+                //
+                // If we are the recipient, then we can finalize the lighting change
+                //
                 }
-           }
+            }
+        });
+
+        // Show event
+    	console.log(date.toLocaleString()+': Subscribing to confirmed transactions of '+ connector.address);
+
+        // Subscribe to confirmed transactions channel
+        nemSdk.com.websockets.subscribe.account.transactions.confirmed(connector, function(res) {
+            // Set time
+            date = new Date();
+            // Show event
+            console.log(date.toLocaleString()+': Received confirmed transaction');
+            // Show data
+            console.log(date.toLocaleString()+': ' + JSON.stringify(res));
         });
         
         // Show event
@@ -291,18 +291,25 @@ function compute_microenergy_use_time_in_millis(microenergy_units, rate_plan, en
 //
 // Hue Specific Functions
 //
-huejay.discover({ strategy: 'upnp' })
-    .then(bridges => {
-        for (let bridge of bridges) {
-            huebridges.push(bridge.ip);
-            console.log(`Id: ${bridge.id}, IP: ${bridge.ip}`);
-        }
-        console.log("About to startup Hue Client");
-        hueStartup();
-    })
-    .catch(error => {
-        console.log(`An error occurred: ${error.message}`);
-    });
+function kickstart() {
+    huejay.discover({ strategy: 'upnp' })
+        .then(bridges => {
+            for (let bridge of bridges) {
+                huebridges.push(bridge.ip);
+                console.log(`Id: ${bridge.id}, IP: ${bridge.ip}`);
+            }
+            if (huebridges.length > 0) {
+                console.log("About to startup Hue Client");
+                hueStartup();
+            } else {
+                console.error("Unable to startup hue discovery, retry");
+                kickstart();
+            }
+        })
+        .catch(error => {
+            console.log(`An error occurred: ${error.message}`);
+        });
+}
 
 function hueStartup() {
     console.log("Startup " + huebridges);
@@ -419,3 +426,5 @@ function hueCmd(udm_device_id, udm_capability, data) {
         console.error("Something bad happend on inbox message, reason:", err);
     }
 }
+
+kickstart();
