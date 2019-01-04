@@ -39,7 +39,7 @@ Another dummy test:
 
 Sending use of lighting 
 
--  curl -X POST -d use=1 https://APP_ID.execute-api.us-west-2.amazonaws.com/latest/use
+-  curl -X POST -d units=1 -d id=myfakeid https://APP_ID.execute-api.us-west-2.amazonaws.com/latest/use
 
 ## Performance
 
