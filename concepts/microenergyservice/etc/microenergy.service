@@ -1,0 +1,15 @@
+[Unit]
+Description=Node.js Microenergy Service
+After=syslog.target
+After=network.target
+
+[Service]
+# Type=forking
+Type=simple
+User=root
+WorkingDirectory=/root/BlockchainInABox/concepts/microenergyservice/server
+ExecStart=/usr/local/bin/node server.js 
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target
